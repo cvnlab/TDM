@@ -4,15 +4,24 @@ TDM is a MATLAB toolbox that implements a temporal-decomposition technique
 for separating microvasculature- and macrovasculature-related responses
 in fMRI time-series data. It is developed by Kendrick Kay (kendrick@post.harvard.edu).
 
-The toolbox has the following dependency. You must download (or clone)
-the repository and ensure that it is on your path.
+The toolbox has the following dependencies. You must download (or clone)
+these repositories and ensure that they are on your path.
 - http://github.com/kendrickkay/knkutils
+- http://github.com/kendrickkay/GLMdenoise
+
+(In actuality, the GLMdenoise repository is not necessary for the core of the 
+TDM technique, which is extracthrfmanifold.m. However, the example dataset
+and example script make use of the GLMdenoise toolbox to perform GLM fitting,
+so you probably want to get the repository.)
 
 The toolbox also relies on several external dependencies, a copy of which are
 included in the folder "external". These external dependencies include:
+- https://www.mathworks.com/matlabcentral/fileexchange/66629-2-d-histogram-plot
 - https://www.github.com/AntonSemechko/S2-Sampling-Toolbox
 - https://research.ics.aalto.fi/ica/fastica/
-- https://www.mathworks.com/matlabcentral/fileexchange/66629-2-d-histogram-plot
+
+(In actuality, the fastica toolbox is necessary only if you want to use
+the ICA-based procedure. An example of this is done in the example1.m script.)
 
 To use the toolbox, add it to your MATLAB path:
   addpath(genpath('TDM'));
@@ -20,7 +29,10 @@ To use the toolbox, add it to your MATLAB path:
 To try the toolbox on an example dataset, change to the TDM directory and then type:
   example1;
 This script will download the example dataset (if it has not already been
-downloaded) and will run the toolbox on the dataset.
+downloaded) and will go through the example analyses.
+
+Outputs from the example script (via MATLAB's publish) are available here:
+https://htmlpreview.github.io/?https://github.com/kendrickkay/TDM/blob/master/html/example1.html
 
 Terms of use: This content is licensed under a Creative Commons Attribution 3.0 
 Unported License (http://creativecommons.org/licenses/by/3.0/us/). You are free 
@@ -33,20 +45,19 @@ If you use TDM in your research, please cite the following pre-print:
     bioRxiv. 
 
 History of major code changes:
-- 2019/12/07 - Initial version.
+- 2019/12/08 - Initial version.
 
 ## CONTENTS
 
 Contents:
 - derivehrf.m - Use PCA to extract an HRF common to a set of timecourses
 - example*.m - Example scripts
-- exampledataset.mat - Example dataset
 - external - External toolboxes included for your convenience
 - extracthrfmanifold.m - The TDM technique
+- html - Outputs from MATLAB's publish
 - icadecomposehrf.m - Alternative ICA-based technique
 - README.md - The file you are reading
-- setup.m - A simple script that downloads the example dataset
-            and adds TDM to the MATLAB path
+- setup.m - A simple script that downloads the example dataset and adds TDM to the MATLAB path
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

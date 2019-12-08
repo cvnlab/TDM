@@ -1,0 +1,804 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Example 1: Apply TDM on an example dataset</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-08"><meta name="DC.source" content="example1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Example 1: Apply TDM on an example dataset</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Download dataset (if necessary) and add TDM to the MATLAB path</a></li><li><a href="#2">Load in the data</a></li><li><a href="#4">Inspect the data</a></li><li><a href="#9">Fit Standard GLM</a></li><li><a href="#12">Fit FIR model</a></li><li><a href="#14">Inspect FIR timecourses for one vertex</a></li><li><a href="#16">Determine an R2 threshold for the FIR results</a></li><li><a href="#18">Extract FIR timecourses</a></li><li><a href="#19">Perform TDM</a></li><li><a href="#20">Inspect TDM figure outputs</a></li><li><a href="#29">Fit TDM GLM</a></li><li><a href="#31">Inspect maps</a></li><li><a href="#35">Alternative ICA-based procedure</a></li></ul></div><h2 id="1">Download dataset (if necessary) and add TDM to the MATLAB path</h2><pre class="codeinput">setup;
+</pre><pre class="codeoutput">Downloading exampledataset.mat (please be patient).
+Downloading is done!
+</pre><h2 id="2">Load in the data</h2><pre class="codeinput"><span class="comment">% Load in the data</span>
+load(<span class="string">'exampledataset.mat'</span>);
+
+<span class="comment">% Check the workspace</span>
+whos
+</pre><pre class="codeoutput">  Name                 Size                 Bytes  Class      Attributes
+
+  ans                  1x48                    96  char                 
+  bc              121695x1                 973560  double               
+  data                 1x4              716540608  cell                 
+  design               1x4                   5280  cell                 
+  extrapmask        1185x859              1017915  logical              
+  imglookup         1185x859              4071660  uint32               
+  stimdur              1x1                      8  double               
+  tr                   1x1                      8  double               
+
+</pre><h2 id="4">Inspect the data</h2><pre class="codeinput"><span class="comment">% Check dimensionality of the data</span>
+data
+</pre><pre class="codeoutput">
+data =
+
+  1x4 cell array
+
+  Columns 1 through 3
+
+    {121695x368 single}    {121695x368 single}    {121695x368 single}
+
+  Column 4
+
+    {121695x368 single}
+
+</pre><pre class="codeinput"><span class="comment">% Check dimensionality of the design matrices</span>
+design
+</pre><pre class="codeoutput">
+design =
+
+  1x4 cell array
+
+    {368x6 double}    {368x6 double}    {368x6 double}    {368x6 double}
+
+</pre><pre class="codeinput"><span class="comment">% Check stimulus duration</span>
+stimdur
+</pre><pre class="codeoutput">
+stimdur =
+
+                       3.5
+
+</pre><pre class="codeinput"><span class="comment">% Check TR</span>
+tr
+</pre><pre class="codeoutput">
+tr =
+
+     1
+
+</pre><h2 id="9">Fit Standard GLM</h2><pre class="codeinput"><span class="comment">% Here, we quickly fit a vanilla ("Standard") GLM that uses a single canonical HRF.</span>
+
+<span class="comment">% Define options (no bootstrapping, no denoising (in order to speed things up))</span>
+opt = struct(<span class="string">'numboots'</span>,0,<span class="string">'numpcstotry'</span>,0);  <span class="comment">% to use denoising, could set numpcstotry to 20</span>
+
+<span class="comment">% Use GLMdenoisedata.m to fit a GLM that incorporates a single canonical HRF.</span>
+<span class="comment">% We use 6 condition-splits (so we get 6 distinct betas for each condition).</span>
+resultsST = GLMdenoisedata(condition_split(design,6),data,stimdur,tr,<span class="string">'assume'</span>,[],opt, <span class="keyword">...</span>
+                           <span class="string">'GLMdenoise_ST_figures'</span>);
+</pre><pre class="codeoutput">*** GLMdenoisedata: generating sanity-check figures. ***
+*** GLMdenoisedata: performing cross-validation to determine R^2 values. ***
+cross-validating model....done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: determining noise pool. ***
+*** GLMdenoisedata: calculating noise regressors. ***
+*** GLMdenoisedata: selected number of PCs is 0. ***
+*** GLMdenoisedata: fitting final model (no denoising, for comparison purposes). ***
+fitting model...done.
+preparing output...done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: fitting final model (with denoising). ***
+fitting model...done.
+preparing output...done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: calculating denoised data and PC weights. ***
+*** GLMdenoisedata: converting to percent BOLD change. ***
+*** GLMdenoisedata: generating figures. ***
+</pre><pre class="codeinput"><span class="comment">% Inspect the R2 (variance explained) map.</span>
+figure;
+temp = resultsST.R2(imglookup);  <span class="comment">% use indexing provided by imglookup to generate a surface map</span>
+temp(extrapmask) = NaN;          <span class="comment">% some pixels are invalid; set these to NaN</span>
+imagesc(temp,[0 50]);
+colormap(hot);
+axis <span class="string">image</span> <span class="string">tight</span> <span class="string">ij</span>;
+</pre><img vspace="5" hspace="5" src="example1_01.png" alt=""> <pre class="codeinput"><span class="comment">% This is a nearest-neighbor rendering of a flat patch of left hemisphere early visual cortex.</span>
+<span class="comment">% Posterior to anterior is left to right, and inferior to superior is bottom to top.</span>
+<span class="comment">% The map looks reasonably sane.</span>
+</pre><h2 id="12">Fit FIR model</h2><pre class="codeinput"><span class="comment">% The first step in performing TDM is to derive unconstrained estimates of response</span>
+<span class="comment">% timecourses by fitting a finite impulse response (FIR) model to the data.</span>
+
+<span class="comment">% Define options (no bootstrapping, no denoising (in order to speed things up))</span>
+opt2 = struct(<span class="string">'numboots'</span>,0,<span class="string">'numpcstotry'</span>,0);  <span class="comment">% to use denoising, could set numpcstotry to 20</span>
+
+<span class="comment">% Use GLMdenoisedata.m to fit a finite impulse response (FIR) model that estimates</span>
+<span class="comment">% a timecourse for every condition. We use 2 condition-splits (so we get 2 sets</span>
+<span class="comment">% of FIR results). We estimate 31 time points (trial onset plus 30 time points);</span>
+<span class="comment">% these time points come at a rate of 1 second since the data are prepared at 1 second.</span>
+resultsFIR = GLMdenoisedata(condition_split(design,2),data,stimdur,tr,<span class="string">'fir'</span>,30,opt2, <span class="keyword">...</span>
+                            <span class="string">'GLMdenoise_FIR_figures'</span>);
+</pre><pre class="codeoutput">*** GLMdenoisedata: generating sanity-check figures. ***
+*** GLMdenoisedata: performing cross-validation to determine R^2 values. ***
+cross-validating model....done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: determining noise pool. ***
+*** GLMdenoisedata: calculating noise regressors. ***
+*** GLMdenoisedata: selected number of PCs is 0. ***
+*** GLMdenoisedata: fitting final model (no denoising, for comparison purposes). ***
+fitting model...done.
+preparing output...done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: fitting final model (with denoising). ***
+fitting model...done.
+preparing output...done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: calculating denoised data and PC weights. ***
+*** GLMdenoisedata: converting to percent BOLD change. ***
+*** GLMdenoisedata: generating figures. ***
+</pre><h2 id="14">Inspect FIR timecourses for one vertex</h2><pre class="codeinput"><span class="comment">% Before proceeding with TDM, let's inspect results from the FIR fitting</span>
+<span class="comment">% to make sure things look reasonable.</span>
+
+<span class="comment">% Make a plot</span>
+ix = 51344;
+figure; hold <span class="string">on</span>;
+cmap0 = jet(6);
+<span class="keyword">for</span> p=1:2     <span class="comment">% condition-split</span>
+  <span class="keyword">for</span> q=1:6   <span class="comment">% condition</span>
+    temp = squeeze(resultsFIR.modelmd(ix,:,:));  <span class="comment">% (2 condition-splits * 6 conditions) x 31 time points</span>
+    plot(0:30,temp((q-1)*2+p,:),<span class="string">'-'</span>,<span class="string">'Color'</span>,cmap0(q,:));
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+straightline(0,<span class="string">'h'</span>,<span class="string">'k-'</span>);
+xlabel(<span class="string">'Time after trial onset (s)'</span>);
+ylabel(<span class="string">'BOLD (%)'</span>);
+</pre><img vspace="5" hspace="5" src="example1_02.png" alt=""> <pre class="codeinput"><span class="comment">% In the figure, we plot two traces (reflecting the 2 condition-splits)</span>
+<span class="comment">% for each of the 6 experimental conditions.</span>
+</pre><h2 id="16">Determine an R2 threshold for the FIR results</h2><pre class="codeinput"><span class="comment">% We want to collect timecourses from vertices that have some minimum</span>
+<span class="comment">% level of signal-to-noise ratio for experimentally evoked BOLD responses.</span>
+
+<span class="comment">% Use an automatic method for determining a reasonable threshold.</span>
+r2thresh = findtailthreshold(resultsFIR.R2(:));
+</pre><img vspace="5" hspace="5" src="example1_03.png" alt=""> <h2 id="18">Extract FIR timecourses</h2><pre class="codeinput"><span class="comment">% Get timecourses for vertices that pass the threshold</span>
+ix = resultsFIR.R2 &gt; r2thresh;
+timecourses = resultsFIR.modelmd(ix,:,:);  <span class="comment">% N x (2 condition-splits * 6 conditions) x 31</span>
+
+<span class="comment">% Get bias-corrected EPI intensities for these vertices</span>
+bcvalues = bc(ix);                         <span class="comment">% N x 1</span>
+</pre><h2 id="19">Perform TDM</h2><pre class="codeinput"><span class="comment">% Now we will pass the timecourses to the core of the TDM technique;</span>
+<span class="comment">% this core is implemented in extracthrfmanifold.m.</span>
+
+<span class="comment">% Define options (we will use defaults for everything)</span>
+opt3 = struct();
+
+<span class="comment">% For this analysis, we have no reason to keep the 2 distinct condition-splits,</span>
+<span class="comment">% so we will average timecourses across the splits (to improve signal-to-noise).</span>
+<span class="comment">% We also change the dimensionality to N x time (31) x conditions (6).</span>
+temp = permute(blob(timecourses,2,2)/2,[1 3 2]);
+
+<span class="comment">% Use extracthrfmanifold.m to derive estimates of the latent early</span>
+<span class="comment">% and late timecourses. The -1 indicates to also write .eps figures.</span>
+resultsTDM = extracthrfmanifold(temp,bcvalues,tr,{<span class="string">'TDM_figures'</span> -1},opt3);
+</pre><pre class="codeoutput">calculating particles...
+Wait while particle positions are being optimized ...
+Iteration #     Net Energy      Time (sec)     
+0               37884.342056    0.0            
+50              33918.001844    0.8            
+100             33917.135499    1.5            
+150             33916.956826    2.2            
+200             33916.932908    2.9            
+205             33916.932728    3.0            
+Optimization completed after 205 iterations. Elapsed time:   3.0 sec
+done.
+initial seed is [56 56 22.2 22.2 0.10843 0.083552 0]
+
+                                         Norm of      First-order 
+ Iteration  Func-count     f(x)          step          optimality
+     0          8         47.0221                           144
+     1         16         21.2549             10           20.2      
+     2         24         13.0428             20             46      
+     3         32         10.3629             40           6.48      
+     4         40         9.43021             80           14.9      
+     5         48         8.44774            160           5.22      
+     6         56         7.06959            320           3.58      
+     7         64         5.03644        103.095           17.3      
+     8         72         4.91788        171.656           8.14      
+     9         80         4.35952         42.914           3.15      
+    10         88         4.35952        31.6697           3.15      
+    11         96         3.82138        7.91742           2.62      
+    12        104         3.16113        12.5185           4.09      
+    13        112         2.96758        9.69473          0.432      
+    14        120         2.95672       0.873406         0.0469      
+    15        128          2.9566       0.162491         0.0031      
+    16        136          2.9566     0.00661539       0.000448      
+
+Local minimum possible.
+
+lsqcurvefit stopped because the final change in the sum of squares relative to 
+its initial value is less than the selected value of the function tolerance.
+
+
+
+</pre><h2 id="20">Inspect TDM figure outputs</h2><p>Show manifold.png</p><p><img vspace="5" hspace="5" src="manifold.png" alt=""> </p><pre class="codeinput"><span class="comment">% In the above figure, the black and gray dots indicate the</span>
+<span class="comment">% Early and Late timecourses, respectively.</span>
+</pre><p>Show modelfit.png</p><p><img vspace="5" hspace="5" src="modelfit.png" alt=""> </p><pre class="codeinput"><span class="comment">% In the above figure, we see that 'Model Fit' is a reasonably</span>
+<span class="comment">% good match to the data shown in 'Final'.</span>
+</pre><p>Show timecourses.png</p><p><img vspace="5" hspace="5" src="timecourses.png" alt=""> </p><pre class="codeinput"><span class="comment">% In the above figure, the Early (black) and Late (gray)</span>
+<span class="comment">% timecourses look reasonable.</span>
+</pre><h2 id="29">Fit TDM GLM</h2><pre class="codeinput"><span class="comment">% Now that we have derived Early and Late timecourses, we can use them to</span>
+<span class="comment">% re-fit the fMRI time-series data.</span>
+
+<span class="comment">% First, we perform condition-splitting on the design matrix.</span>
+<span class="comment">% We use 6 condition-splits (so that we get 6 betas for each condition).</span>
+design0 = condition_split(design,6);
+
+<span class="comment">% Next, we perform convolution with the Early and Late timecourses separately.</span>
+<span class="keyword">for</span> p=1:length(design0)
+  temp = [];
+  <span class="keyword">for</span> q=1:2
+    temp = [temp conv2(full(design0{p}),resultsTDM.elhrf(q,:)')];
+  <span class="keyword">end</span>
+  design0{p} = temp(1:size(design0{p},1),:);
+<span class="keyword">end</span>
+
+<span class="comment">% Let's take a quick look at the design matrix for the first run.</span>
+<span class="comment">% The first set of columns correspond to the Early timecourse;</span>
+<span class="comment">% the second set of columns correspond to the Late timecourse.</span>
+figure;
+imagesc(design0{1});
+colormap(gray);
+</pre><img vspace="5" hspace="5" src="example1_04.png" alt=""> <pre class="codeinput"><span class="comment">% Finally, we proceed to fit the GLM.</span>
+
+<span class="comment">% Define options (no bootstrapping, no denoising (in order to speed things up))</span>
+opt4 = struct(<span class="string">'numboots'</span>,0,<span class="string">'numpcstotry'</span>,0);  <span class="comment">% to use denoising, could set numpcstotry to 20</span>
+
+<span class="comment">% Use GLMdenoisedata.m to fit a GLM that incorporates the TDM-derived timecourses.</span>
+<span class="comment">% Note that we already convolved in the HRFs, so we use an &lt;hrfknobs&gt; input of 1 which</span>
+<span class="comment">% effectively convolves our design matrices with 1 (which doesn't change anything).</span>
+resultsTDMGLM = GLMdenoisedata(design0,data,stimdur,tr,<span class="string">'assume'</span>,1,opt4, <span class="keyword">...</span>
+                              <span class="string">'GLMdenoise_TDMGLM_figures'</span>);
+</pre><pre class="codeoutput">*** GLMdenoisedata: generating sanity-check figures. ***
+*** GLMdenoisedata: performing cross-validation to determine R^2 values. ***
+cross-validating model....done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: determining noise pool. ***
+*** GLMdenoisedata: calculating noise regressors. ***
+*** GLMdenoisedata: selected number of PCs is 0. ***
+*** GLMdenoisedata: fitting final model (no denoising, for comparison purposes). ***
+fitting model...done.
+preparing output...done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: fitting final model (with denoising). ***
+fitting model...done.
+preparing output...done.
+computing model fits...done.
+computing R^2...done.
+computing SNR...done.
+*** GLMdenoisedata: calculating denoised data and PC weights. ***
+*** GLMdenoisedata: converting to percent BOLD change. ***
+*** GLMdenoisedata: generating figures. ***
+</pre><h2 id="31">Inspect maps</h2><pre class="codeinput"><span class="comment">% First, prepare a convenient betas matrix.</span>
+<span class="comment">% The dimensionality is vertices x 3 depths x 6 condition-splits x 6 conditions x 2 loadings</span>
+betas0 = reshape(resultsTDMGLM.modelmd{2},[],3,6,6,2);
+
+<span class="comment">% Also prepare a convenient EPI intensity matrix.</span>
+<span class="comment">% The dimensionality is vertices x 3 depths.</span>
+bc0 = reshape(bc,[],3);
+
+<span class="comment">% Look at Early and Late betas for each experimental condition.</span>
+<span class="comment">% In the following figure, the rows indicate Early/Late,</span>
+<span class="comment">% while the columns indicate different conditions.</span>
+depthix = 1;  <span class="comment">% look at the first depth index (which is Depth 2)</span>
+figureprep([100 100 1200 600],1);
+<span class="keyword">for</span> q=1:2     <span class="comment">% early/late</span>
+  <span class="keyword">for</span> p=1:6   <span class="comment">% condition</span>
+    subplot(2,6,(q-1)*6+p);
+    temp = mean(betas0(:,depthix,:,p,q),3);
+    temp = temp(imglookup);
+    temp(extrapmask) = NaN;
+    imagesc(temp,[-10 10]);
+    colormap(cmapsign4);
+    axis <span class="string">image</span> <span class="string">tight</span> <span class="string">ij</span> <span class="string">off</span>;
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="example1_05.png" alt=""> <pre class="codeinput"><span class="comment">% Look at peak eccentricity tuning for each depth.</span>
+<span class="comment">% In the following figure, the rows indicate Depth 2, 4, and 6,</span>
+<span class="comment">% while the columns indicate Early/Late.</span>
+figureprep([100 100 1200 1000],1);
+<span class="keyword">for</span> q=1:2    <span class="comment">% early/late</span>
+  <span class="keyword">for</span> d=1:3  <span class="comment">% depth index</span>
+    subplot(3,2,(d-1)*2+q); hold <span class="string">on</span>;
+    temp = centerofmass(posrect(mean(betas0(:,d,:,:,q),3)),4);
+    temp = temp(imglookup);
+    temp(extrapmask) = NaN;
+    imagesc(temp,[1 6]);
+    colormap(jet);
+    axis <span class="string">image</span> <span class="string">tight</span> <span class="string">ij</span> <span class="string">off</span>;
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="example1_06.png" alt=""> <pre class="codeinput"><span class="comment">% Look at bias-corrected EPI intensity</span>
+figureprep([100 100 1200 1000],1);
+<span class="keyword">for</span> d=1:3  <span class="comment">% depth index</span>
+  subplot(3,1,d); hold <span class="string">on</span>;
+  temp = bc0(:,d);
+  temp = temp(imglookup);
+  temp(extrapmask) = NaN;
+  imagesc(temp,[0 2]);
+  colormap(gray);
+  axis <span class="string">image</span> <span class="string">tight</span> <span class="string">ij</span> <span class="string">off</span>;
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="example1_07.png" alt=""> <h2 id="35">Alternative ICA-based procedure</h2><pre class="codeinput"><span class="comment">% We developed and tested an alternative ICA-based procedure for deriving latent timecourses.</span>
+<span class="comment">% Although we believe the TDM method is preferable to the ICA-based procedure, we include here</span>
+<span class="comment">% an example of performing that procedure for sake of completeness.</span>
+
+<span class="comment">% Tweak the dimensionality of timecourses to N x time (31) x conditions (6) x splits (2)</span>
+tc0 = permute(reshape(timecourses,size(timecourses,1),2,size(timecourses,2)/2,[]),[1 4 3 2]);
+
+<span class="comment">% Define options (we will use defaults for everything)</span>
+opt5 = struct();
+
+<span class="comment">% Perform ICA-based procedure for deriving latent timecourses</span>
+[icahrf,icahrfmetrics,pcahrf,pcahrfmetrics,allics,chosenics] = <span class="keyword">...</span>
+  icadecomposehrf(tc0,tr,[],{<span class="string">'ICA_figures'</span> -1},opt5);
+</pre><pre class="codeoutput">Warning: converting input data into regular (double) precision.
+Number of signals: 31
+Number of samples: 195126
+Calculating covariance...
+Dimension not reduced.
+Selected [ 31 ] dimensions.
+Smallest remaining (non-zero) eigenvalue [ 0.0307595 ]
+Largest remaining (non-zero) eigenvalue [ 106.584 ]
+Sum of removed eigenvalues [ 0 ]
+[ 100 ] % of (non-zero) eigenvalues retained.
+Whitening...
+Check: covariance differs from identity by [ 4.75175e-14 ].
+Used approach [ defl ].
+Used nonlinearity [ pow3 ].
+Using stabilized algorithm.
+Starting ICA calculation...
+IC 1 ......................computed ( 22 steps ) 
+IC 2 .....................computed ( 21 steps ) 
+IC 3 .......................computed ( 23 steps ) 
+IC 4 ...........................................................computed ( 59 steps ) 
+IC 5 ...........................................computed ( 43 steps ) 
+IC 6 .............................................................................................computed ( 93 steps ) 
+IC 7 ..................................computed ( 34 steps ) 
+IC 8 .......................computed ( 23 steps ) 
+IC 9 ..................................................................................................................................................................................................computed ( 194 steps ) 
+IC 10 ..................................computed ( 34 steps ) 
+IC 11 ..........................................................................................computed ( 90 steps ) 
+IC 12 ...................................computed ( 35 steps ) 
+IC 13 ........................................................computed ( 56 steps ) 
+IC 14 ...................................................computed ( 51 steps ) 
+IC 15 ..........................................................................................................computed ( 106 steps ) 
+IC 16 .................................................................................................................computed ( 113 steps ) 
+IC 17 ..................................................................................computed ( 82 steps ) 
+IC 18 .........................................................................................computed ( 89 steps ) 
+IC 19 ...................................................................................................................computed ( 115 steps ) 
+IC 20 .........................................................................................................computed ( 105 steps ) 
+IC 21 ...........................................................................computed ( 75 steps ) 
+IC 22 .................................................computed ( 49 steps ) 
+IC 23 ........................................................................computed ( 72 steps ) 
+IC 24 .............................................................computed ( 61 steps ) 
+IC 25 ......................................computed ( 38 steps ) 
+IC 26 ...........................................................................................................................................................................computed ( 171 steps ) 
+IC 27 ..............................................................................computed ( 78 steps ) 
+IC 28 ...........................................................................................................................................computed ( 139 steps ) 
+IC 29 ..............................................................................................computed ( 94 steps ) 
+IC 30 ......................................computed ( 38 steps ) 
+IC 31 ..computed ( 2 steps ) 
+Done.
+Adding the mean back to the data.
+Warning: converting input data into regular (double) precision.
+Number of signals: 31
+Number of samples: 195126
+Calculating covariance...
+Dimension not reduced.
+Selected [ 31 ] dimensions.
+Smallest remaining (non-zero) eigenvalue [ 0.0276808 ]
+Largest remaining (non-zero) eigenvalue [ 108.795 ]
+Sum of removed eigenvalues [ 0 ]
+[ 100 ] % of (non-zero) eigenvalues retained.
+Whitening...
+Check: covariance differs from identity by [ 6.11431e-14 ].
+Used approach [ defl ].
+Used nonlinearity [ pow3 ].
+Using stabilized algorithm.
+Starting ICA calculation...
+IC 1 ......................computed ( 22 steps ) 
+IC 2 ....................computed ( 20 steps ) 
+IC 3 .........................computed ( 25 steps ) 
+IC 4 ................................................computed ( 48 steps ) 
+IC 5 ................................................................computed ( 64 steps ) 
+IC 6 ......................................................................computed ( 70 steps ) 
+IC 7 ......................................................................................................................................................computed ( 150 steps ) 
+IC 8 ......................................................................................computed ( 86 steps ) 
+IC 9 ...........................computed ( 27 steps ) 
+IC 10 ...........................................................................................computed ( 91 steps ) 
+IC 11 ....................................computed ( 36 steps ) 
+IC 12 ....................................computed ( 36 steps ) 
+IC 13 .....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................Taking long (reducing step size) ...................................................................................................................computed ( 616 steps ) 
+IC 14 .................................................computed ( 49 steps ) 
+IC 15 ......................................................computed ( 54 steps ) 
+IC 16 .........................................................................................................................................................................................................computed ( 201 steps ) 
+IC 17 .......................................................................computed ( 71 steps ) 
+IC 18 ...........................................................................................................computed ( 107 steps ) 
+IC 19 .......................................................................................computed ( 87 steps ) 
+IC 20 ...........................................................computed ( 59 steps ) 
+IC 21 ........................................................................computed ( 72 steps ) 
+IC 22 ...........................................................................................................computed ( 107 steps ) 
+IC 23 .............................................................................................computed ( 93 steps ) 
+IC 24 ..................................................................................................................................................................................................................................................................computed ( 258 steps ) 
+IC 25 ..................................................................................................................................................................................................................................computed ( 226 steps ) 
+IC 26 .......................................................computed ( 55 steps ) 
+IC 27 .....................................................................................................computed ( 101 steps ) 
+IC 28 ................................................................................................................computed ( 112 steps ) 
+IC 29 ...........................................................................................................computed ( 107 steps ) 
+IC 30 .................................................................................................computed ( 97 steps ) 
+IC 31 ..computed ( 2 steps ) 
+Done.
+Adding the mean back to the data.
+</pre><pre class="codeinput"><span class="comment">% Inspect results</span>
+figure;
+plot(0:30,icahrf');
+straightline(0,<span class="string">'h'</span>,<span class="string">'k-'</span>);
+xlabel(<span class="string">'Time (s)'</span>);
+ylabel(<span class="string">'Signal'</span>);
+</pre><img vspace="5" hspace="5" src="example1_08.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Example 1: Apply TDM on an example dataset
+
+%% Download dataset (if necessary) and add TDM to the MATLAB path
+
+setup;
+
+%% Load in the data
+
+% Load in the data
+load('exampledataset.mat');
+
+% Check the workspace
+whos
+%%
+
+%% Inspect the data
+
+% Check dimensionality of the data
+data
+%%
+
+% Check dimensionality of the design matrices
+design
+%%
+
+% Check stimulus duration
+stimdur
+%%
+
+% Check TR
+tr
+%%
+
+%% Fit Standard GLM
+
+% Here, we quickly fit a vanilla ("Standard") GLM that uses a single canonical HRF.
+
+% Define options (no bootstrapping, no denoising (in order to speed things up))
+opt = struct('numboots',0,'numpcstotry',0);  % to use denoising, could set numpcstotry to 20
+
+% Use GLMdenoisedata.m to fit a GLM that incorporates a single canonical HRF.
+% We use 6 condition-splits (so we get 6 distinct betas for each condition).
+resultsST = GLMdenoisedata(condition_split(design,6),data,stimdur,tr,'assume',[],opt, ...
+                           'GLMdenoise_ST_figures');
+%%
+
+% Inspect the R2 (variance explained) map.
+figure;
+temp = resultsST.R2(imglookup);  % use indexing provided by imglookup to generate a surface map
+temp(extrapmask) = NaN;          % some pixels are invalid; set these to NaN
+imagesc(temp,[0 50]);
+colormap(hot);
+axis image tight ij;
+%%
+
+% This is a nearest-neighbor rendering of a flat patch of left hemisphere early visual cortex.
+% Posterior to anterior is left to right, and inferior to superior is bottom to top.
+% The map looks reasonably sane.
+
+%% Fit FIR model
+
+% The first step in performing TDM is to derive unconstrained estimates of response
+% timecourses by fitting a finite impulse response (FIR) model to the data.
+
+% Define options (no bootstrapping, no denoising (in order to speed things up))
+opt2 = struct('numboots',0,'numpcstotry',0);  % to use denoising, could set numpcstotry to 20
+
+% Use GLMdenoisedata.m to fit a finite impulse response (FIR) model that estimates
+% a timecourse for every condition. We use 2 condition-splits (so we get 2 sets
+% of FIR results). We estimate 31 time points (trial onset plus 30 time points);
+% these time points come at a rate of 1 second since the data are prepared at 1 second.
+resultsFIR = GLMdenoisedata(condition_split(design,2),data,stimdur,tr,'fir',30,opt2, ...
+                            'GLMdenoise_FIR_figures');
+%%
+
+%% Inspect FIR timecourses for one vertex
+
+% Before proceeding with TDM, let's inspect results from the FIR fitting
+% to make sure things look reasonable.
+
+% Make a plot
+ix = 51344;
+figure; hold on;
+cmap0 = jet(6);
+for p=1:2     % condition-split
+  for q=1:6   % condition
+    temp = squeeze(resultsFIR.modelmd(ix,:,:));  % (2 condition-splits * 6 conditions) x 31 time points
+    plot(0:30,temp((q-1)*2+p,:),'-','Color',cmap0(q,:));
+  end
+end
+straightline(0,'h','k-');
+xlabel('Time after trial onset (s)');
+ylabel('BOLD (%)');
+%%
+
+% In the figure, we plot two traces (reflecting the 2 condition-splits)
+% for each of the 6 experimental conditions.
+
+%% Determine an R2 threshold for the FIR results
+
+% We want to collect timecourses from vertices that have some minimum
+% level of signal-to-noise ratio for experimentally evoked BOLD responses.
+
+% Use an automatic method for determining a reasonable threshold.
+r2thresh = findtailthreshold(resultsFIR.R2(:));
+%%
+
+%% Extract FIR timecourses
+
+% Get timecourses for vertices that pass the threshold
+ix = resultsFIR.R2 > r2thresh;
+timecourses = resultsFIR.modelmd(ix,:,:);  % N x (2 condition-splits * 6 conditions) x 31
+
+% Get bias-corrected EPI intensities for these vertices
+bcvalues = bc(ix);                         % N x 1
+
+%% Perform TDM
+
+% Now we will pass the timecourses to the core of the TDM technique;
+% this core is implemented in extracthrfmanifold.m.
+
+% Define options (we will use defaults for everything)
+opt3 = struct();
+
+% For this analysis, we have no reason to keep the 2 distinct condition-splits,
+% so we will average timecourses across the splits (to improve signal-to-noise).
+% We also change the dimensionality to N x time (31) x conditions (6).
+temp = permute(blob(timecourses,2,2)/2,[1 3 2]);
+
+% Use extracthrfmanifold.m to derive estimates of the latent early
+% and late timecourses. The -1 indicates to also write .eps figures.
+resultsTDM = extracthrfmanifold(temp,bcvalues,tr,{'TDM_figures' -1},opt3);
+
+%% Inspect TDM figure outputs
+
+%%
+% Show manifold.png
+%
+% <<../TDM_figures/manifold.png>>
+%%
+
+% In the above figure, the black and gray dots indicate the
+% Early and Late timecourses, respectively.
+%%
+
+%%
+% Show modelfit.png
+%
+% <<../TDM_figures/modelfit.png>>
+%%
+
+% In the above figure, we see that 'Model Fit' is a reasonably
+% good match to the data shown in 'Final'.
+%%
+
+%%
+% Show timecourses.png
+%
+% <<../TDM_figures/timecourses.png>>
+%%
+
+% In the above figure, the Early (black) and Late (gray)
+% timecourses look reasonable.
+
+%% Fit TDM GLM
+
+% Now that we have derived Early and Late timecourses, we can use them to
+% re-fit the fMRI time-series data.
+
+% First, we perform condition-splitting on the design matrix.
+% We use 6 condition-splits (so that we get 6 betas for each condition).
+design0 = condition_split(design,6);
+
+% Next, we perform convolution with the Early and Late timecourses separately.
+for p=1:length(design0)
+  temp = [];
+  for q=1:2
+    temp = [temp conv2(full(design0{p}),resultsTDM.elhrf(q,:)')];
+  end
+  design0{p} = temp(1:size(design0{p},1),:);
+end
+
+% Let's take a quick look at the design matrix for the first run.
+% The first set of columns correspond to the Early timecourse;
+% the second set of columns correspond to the Late timecourse.
+figure;
+imagesc(design0{1});
+colormap(gray);
+%%
+
+% Finally, we proceed to fit the GLM.
+
+% Define options (no bootstrapping, no denoising (in order to speed things up))
+opt4 = struct('numboots',0,'numpcstotry',0);  % to use denoising, could set numpcstotry to 20
+
+% Use GLMdenoisedata.m to fit a GLM that incorporates the TDM-derived timecourses.
+% Note that we already convolved in the HRFs, so we use an <hrfknobs> input of 1 which
+% effectively convolves our design matrices with 1 (which doesn't change anything).
+resultsTDMGLM = GLMdenoisedata(design0,data,stimdur,tr,'assume',1,opt4, ...
+                              'GLMdenoise_TDMGLM_figures');
+
+%% Inspect maps
+
+% First, prepare a convenient betas matrix.
+% The dimensionality is vertices x 3 depths x 6 condition-splits x 6 conditions x 2 loadings
+betas0 = reshape(resultsTDMGLM.modelmd{2},[],3,6,6,2);
+
+% Also prepare a convenient EPI intensity matrix.
+% The dimensionality is vertices x 3 depths.
+bc0 = reshape(bc,[],3);
+
+% Look at Early and Late betas for each experimental condition.
+% In the following figure, the rows indicate Early/Late,
+% while the columns indicate different conditions.
+depthix = 1;  % look at the first depth index (which is Depth 2)
+figureprep([100 100 1200 600],1);
+for q=1:2     % early/late
+  for p=1:6   % condition
+    subplot(2,6,(q-1)*6+p);
+    temp = mean(betas0(:,depthix,:,p,q),3);
+    temp = temp(imglookup);
+    temp(extrapmask) = NaN;
+    imagesc(temp,[-10 10]);
+    colormap(cmapsign4);
+    axis image tight ij off;
+  end
+end
+%%
+
+% Look at peak eccentricity tuning for each depth.
+% In the following figure, the rows indicate Depth 2, 4, and 6,
+% while the columns indicate Early/Late.
+figureprep([100 100 1200 1000],1);
+for q=1:2    % early/late
+  for d=1:3  % depth index
+    subplot(3,2,(d-1)*2+q); hold on;
+    temp = centerofmass(posrect(mean(betas0(:,d,:,:,q),3)),4);
+    temp = temp(imglookup);
+    temp(extrapmask) = NaN;
+    imagesc(temp,[1 6]);
+    colormap(jet);
+    axis image tight ij off;
+  end
+end
+%%
+
+% Look at bias-corrected EPI intensity
+figureprep([100 100 1200 1000],1);
+for d=1:3  % depth index
+  subplot(3,1,d); hold on;
+  temp = bc0(:,d);
+  temp = temp(imglookup);
+  temp(extrapmask) = NaN;
+  imagesc(temp,[0 2]);
+  colormap(gray);
+  axis image tight ij off;
+end
+%%
+
+%% Alternative ICA-based procedure
+
+% We developed and tested an alternative ICA-based procedure for deriving latent timecourses.
+% Although we believe the TDM method is preferable to the ICA-based procedure, we include here
+% an example of performing that procedure for sake of completeness.
+
+% Tweak the dimensionality of timecourses to N x time (31) x conditions (6) x splits (2)
+tc0 = permute(reshape(timecourses,size(timecourses,1),2,size(timecourses,2)/2,[]),[1 4 3 2]);
+
+% Define options (we will use defaults for everything)
+opt5 = struct();
+
+% Perform ICA-based procedure for deriving latent timecourses
+[icahrf,icahrfmetrics,pcahrf,pcahrfmetrics,allics,chosenics] = ...
+  icadecomposehrf(tc0,tr,[],{'ICA_figures' -1},opt5);
+%%
+
+% Inspect results
+figure;
+plot(0:30,icahrf');
+straightline(0,'h','k-');
+xlabel('Time (s)');
+ylabel('Signal');
+%%
+
+##### SOURCE END #####
+--></body></html>
