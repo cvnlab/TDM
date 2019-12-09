@@ -34,6 +34,9 @@ downloaded) and will go through the example analyses.
 Outputs from the example script (via MATLAB's publish) are available here:
 https://htmlpreview.github.io/?https://github.com/kendrickkay/TDM/blob/master/html/example1.html
 
+A video walk-through of the example script is viewable here:
+  https://www.youtube.com/watch?v=Sz13i-9EtmA
+
 Terms of use: This content is licensed under a Creative Commons Attribution 3.0 
 Unported License (http://creativecommons.org/licenses/by/3.0/us/). You are free 
 to share and adapt the content as you please, under the condition that you cite 
