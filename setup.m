@@ -4,8 +4,8 @@
 % Download the dataset if it has not already been downloaded.
 % (If you like, you may manually download the dataset from:
 %    https://osf.io/j2wsc/)
-files = {'exampledataset.mat'};
-osfids = {'d6z8s'};
+files = {'exampledataset.mat' 'exampledataset_inputsonly.mat'};
+osfids = {'d6z8s' '89mfu'};
 for p=1:length(files)
   if ~exist(fullfile(pwd,files{p}),'file')
     fprintf('Downloading %s (please be patient).\n',files{p});
