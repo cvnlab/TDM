@@ -10,18 +10,17 @@ these repositories and ensure that they are on your path.
 - http://github.com/kendrickkay/GLMdenoise
 
 (In actuality, the GLMdenoise repository is not necessary for the core of the 
-TDM technique, which is extracthrfmanifold.m. However, the example dataset
-and example script make use of the GLMdenoise toolbox to perform GLM fitting,
+TDM technique, which is extracthrfmanifold.m. However, the example1.m
+script makes use of the GLMdenoise toolbox to perform GLM fitting,
 so you probably want to get the repository.)
 
 The toolbox also relies on several external dependencies, a copy of which are
 included in the folder "external". These external dependencies include:
-- https://www.mathworks.com/matlabcentral/fileexchange/66629-2-d-histogram-plot
 - https://www.github.com/AntonSemechko/S2-Sampling-Toolbox
 - https://research.ics.aalto.fi/ica/fastica/
+- hist2d.m (web link is broken)
 
-(In actuality, the fastica toolbox is necessary only if you want to use
-the ICA-based procedure. An example of this is done in the example1.m script.)
+(The fastica toolbox is necessary only if you want to use the ICA-based procedure.)
 
 To use the toolbox, add it to your MATLAB path:
   addpath(genpath('TDM'));
@@ -29,13 +28,16 @@ To use the toolbox, add it to your MATLAB path:
 To try the toolbox on an example dataset, change to the TDM directory and then type:
   example1;
 This script will download the example dataset (if it has not already been
-downloaded) and will go through the example analyses.
+downloaded) and will go through the example analyses. The runtime of the 
+analysis will likely be no more than about 5-10 minutes.
 
 Outputs from the example script (via MATLAB's publish) are available here:
 https://htmlpreview.github.io/?https://github.com/kendrickkay/TDM/blob/master/html/example1.html
+https://htmlpreview.github.io/?https://github.com/kendrickkay/TDM/blob/master/html/example2.html
 
-A video walk-through of the example script is viewable here:
+A video walk-through of the example1.m script is viewable here:
   https://www.youtube.com/watch?v=Sz13i-9EtmA
+The video is quite comprehensive in what it covers and discusses.
 
 Terms of use: This content is licensed under a Creative Commons Attribution 3.0 
 Unported License (http://creativecommons.org/licenses/by/3.0/us/). You are free 
@@ -47,7 +49,11 @@ If you use TDM in your research, please cite the following pre-print:
     TDM: a temporal decomposition method for removing venous effects from task-based fMRI.
     bioRxiv. 
 
+The code has been successfully run on MATLAB R2018a, but is likely compatible with
+any recent version of MATLAB.
+
 History of major code changes:
+- 2020/03/30 - Version 1.1. See extracthrfmanifold.m for description of changes.
 - 2019/12/08 - Initial version.
 
 ## CONTENTS
@@ -60,7 +66,7 @@ Contents:
 - html - Outputs from MATLAB's publish
 - icadecomposehrf.m - Alternative ICA-based technique
 - README.md - The file you are reading
-- setup.m - A simple script that downloads the example dataset and adds TDM to the MATLAB path
+- setup.m - A simple script that downloads the example data files and adds TDM to the MATLAB path
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
