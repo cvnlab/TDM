@@ -15,7 +15,7 @@ function results = extracthrfmanifold(data,intensity,tr,wantfigs,opt)
 %   0 means do not create any figures
 %   1 means create figures in new figure windows
 %   A means write figures to folder A
-%   {A mode} is like A but with specification of the <mode> input to printnice.m
+%   {A mode} is like A but with specification of the <mode> input to figurewrite.m
 %   Default: 1.
 % <opt> (optional) is a struct with:
 %   <rng> (optional) is [A B] indicating the range (in seconds) over which to
@@ -37,6 +37,9 @@ function results = extracthrfmanifold(data,intensity,tr,wantfigs,opt)
 %     vector-length with weights of 1 and 2, respectively.  Default is 1 which means
 %     simply average together density and vector-length.  If you set <vlengthweight> to
 %     0, this in effect means only use the density.
+%   <ignorenegative> (optional) is whether to ignore timecourses that have negative loadings
+%     on the first PC. If 1, we ignore. If 0, we automatically mirror across the origin
+%     to ensure that loadings on the first PC are positive. Default: 0.
 %   <wantpause> (optional) is whether to issue a keyboard statement right before completion.
 %     Default: 0.
 %
@@ -132,13 +135,34 @@ function results = extracthrfmanifold(data,intensity,tr,wantfigs,opt)
 % <nprep3> is the weighted average of <nprep> and <prep2> (step 9).
 %   This is the final 2D image that the Gaussian is fit to.
 % <params> is 1 x 7 with the estimated model parameters (fitgaussian2doriented.m)
+% <R2> is the coefficient of determination (R^2) indicating the percentage of 
+%   variance explained by the model fit.
 % <gcoord> is 3 x 2 with x- and y-coordinates for 3 points: mean, early, late.
 %   Note that the z-coordinate is implicit since the coordinates reside on
 %   the unit sphere.
-
-% history:
+% <fullarc> is 181 x 3 with x-, y-, and z-coordinates for 181 points equally spaced 
+%   along the semicircle defined by the early and late vectors. (The spacing in-between
+%   points is exactly 1 degree.) This output might be useful for choosing alternative
+%   early and late timecourses. The start of the semicircle is on the "early" side;
+%   the end of the semicircle is on the "late" side.
+% <specialangles> 1 x 2 with the exact angles corresponding to the early and late
+%   timecourses with respect to the <fullarc>. The angles lie within the range 0-180.
+%
+% History:
+% - 2020/03/30 - version 1.1. changes include:
+%     (1) tweak documentation
+%     (2) add opt.ignorenegative input option
+%     (3) expose results.R2 output
+%     (4) new outputs results.fullarc, results.specialangles
+%     (5) new example usage (exampledataset_inputsonly.mat)
 % - 2019/12/07 - official check-in (version 1.0).
 % - 2019/04/27 - change nprep to save the normalized version of nprep.
+%
+% Example usage:
+% - Please see example1.m for a full example.
+% - A condensed version is provided in example2.m, and is as follows:
+%     load('exampledataset_inputsonly.mat','data','intensity','tr');
+%     results = extracthrfmanifold(data,intensity,tr,1);
 
 %% %%%%% SETUP
 
@@ -168,6 +192,9 @@ if ~isfield(opt,'hrfbasis') || isempty(opt.hrfbasis)
 end
 if ~isfield(opt,'vlengthweight') || isempty(opt.vlengthweight)
   opt.vlengthweight = 1;
+end
+if ~isfield(opt,'ignorenegative') || isempty(opt.ignorenegative)
+  opt.ignorenegative = 0;
 end
 if ~isfield(opt,'wantpause') || isempty(opt.wantpause)
   opt.wantpause = 0;
@@ -237,8 +264,14 @@ end
 % project onto basis
 m0 = squish(permute(data,[3 1 2]),2) * opt.hrfbasis;  % N x 3 with coordinates in the HRF basis space
 
-% flip each timecourse such that loading on first component is positive
-m0 = bsxfun(@times,m0,sign(m0(:,1)));
+% if opt.ignorenegative is 0, flip each timecourse such that loading on first component is positive.
+% otherwise, just discard the timecourses that load negative on the first component.
+if opt.ignorenegative == 0
+  m0 = bsxfun(@times,m0,sign(m0(:,1)));
+else
+  negix = m0(:,1) < 0;
+  m0 = m0(~negix,:);
+end
 
 % map to the unit sphere
 m0n = unitlength(m0,2);
@@ -256,6 +289,11 @@ ZZZ0 = m0n(:,1);
 % prepare the intensity (i.e. the darkness).
 % note that we repeat the intensity for the different conditions.
 d0 = squish(permute(repmat(intensity,[1 1 numcond]),[3 1 2]),2);  % N x 1
+
+% we have to make sure to perform the subselection if we are ignoring negative timecourses.
+if opt.ignorenegative
+  d0 = d0(~negix);
+end
 
 %% %%%%% COMPUTE ORTHOGRAPHICALLY MAPPED DATA
 
@@ -409,6 +447,9 @@ bfun = @(coord) (coord - (1+size(nprep3,1))/2) / size(nprep3,1) * (opt.binsEDGES
 gcoord =    bfun(gcoord);
 ellipsoid = bfun(ellipsoid);
 
+% check whether endpoints are on the sphere
+assert(all(sum(gcoord(2:3,:).^2,2) < 1),'principal axis extends beyond unit circle');
+
 % define function to undo the rotation-to-z+
 undofun = @(x) inv(rotmatrix) * [x sqrt(1-sum(x.^2,2)) ones(size(x,1),1)]';  % result is 4 x N
 
@@ -451,6 +492,60 @@ if loc1 > loc2
   elhrf = elhrf([2 1],:);
   elhrfmetrics = elhrfmetrics([2 1],:);
   gcoord([2 3],:) = gcoord([3 2],:);  % NOTE: gcoord is now in the order of [mean,early,late]
+end
+
+%% %%%%% PREPARE FULL SEMICIRCLE FOR OUTPUT
+
+% figure out equator points
+eltemp = [gcoord(2:3,:) sqrt(1-sum(gcoord(2:3,:).^2,2))];         % 2 x 3 with coordinates of early and late
+[~,~,orthbasis] = svd(eltemp,0);                                  % orthbasis(:,1:2) is 3x2 with 2 PCs
+wt2 = [1 -1] * sqrt(1./(orthbasis(3,2)^2/orthbasis(3,1)^2+1));    % weight on second PC (1 x 2)
+wt1 = -wt2*orthbasis(3,2)/orthbasis(3,1);                         % weight on first PC (1 x 2)
+equatorpoints = orthbasis(:,1)*wt1 + orthbasis(:,2)*wt2;          % 3 x 2 with coordinates of the two equator points
+
+% figure out the pole that points towards z+
+if dot(equatorpoints(:,1),orthbasis(:,1))==1
+  pole = unitlength(projectionmatrix(equatorpoints(:,1))*orthbasis(:,2));
+else
+  pole = unitlength(projectionmatrix(equatorpoints(:,1))*orthbasis(:,1));
+end
+if pole(3) < 0
+  pole = -pole;  % 3 x 1 with the pole
+end
+
+% let's suppose the second column in equatorpoints is the positive x+ direction.
+% then, if the x-coordinate of the early is less than the x-coordinate of the late,
+% we don't have to do anything.
+if eltemp(1,:)*equatorpoints(:,2) < eltemp(2,:)*equatorpoints(:,2)
+else
+  equatorpoints = equatorpoints(:,[2 1]);  % otherwise, we have to swap
+end
+
+% now, the first and second columns of equatorpoints correspond
+% to "start" and "finish", respectively.
+
+% construct the full arc
+fullarc = constructpathonsphere([equatorpoints(:,1) pole equatorpoints(:,2)]',1);
+if size(fullarc,1) < 181
+  fullarc(end+1,:) = equatorpoints(:,2);  % deal with precision error
+end
+
+% compute the angles of the early and the late
+specialangles = (acos(eltemp*equatorpoints(:,1))/pi*180)';  % 1 x 2
+
+% visualization check
+if 0
+  figure; hold on;
+  scatter3(eltemp(1,1),eltemp(1,2),eltemp(1,3),'ro');
+  scatter3(eltemp(2,1),eltemp(2,2),eltemp(2,3),'bo');
+  scatter3(equatorpoints(1,1),equatorpoints(2,1),equatorpoints(3,1),'cx');
+  scatter3(equatorpoints(1,2),equatorpoints(2,2),equatorpoints(3,2),'cd');
+  scatter3(pole(1),pole(2),pole(3),'ko');
+  for zz=1:size(fullarc,1)
+    scatter3(fullarc(zz,1),fullarc(zz,2),fullarc(zz,3),'k.');
+  end
+  axis equal;
+  view(3);
 end
 
 %% %%%%% FINALLY, LET'S MAKE SOME FIGURES
@@ -568,6 +663,11 @@ if ~isequal(wantfigs,0)
       % early and late
     scatter(gcoord(2,1),gcoord(2,2),'ko','filled');
     set(scatter(gcoord(3,1),gcoord(3,2),'ko','filled'),'CData',[.5 .5 .5]);
+    %  % plot every 0.5 sd from the full arc
+    %halfsd = (specialangles(2)-mean(specialangles))/2;
+    %angs = [fliplr(mean(specialangles):-halfsd:0) mean(specialangles)+halfsd:halfsd:180];
+    %scatter(fullarc(round(angs)+1,1),fullarc(round(angs)+1,2),'r.');
+
   end
   if ~isequal(wantfigs,1)
     figurewrite(sprintf('manifold'),[],wantfigs{2},wantfigs{1});
@@ -579,7 +679,7 @@ end
 
 allvars = {'elhrf' 'elhrfmetrics' 'pcahrf' 'pcahrfmetrics' 'gcoord' 'gcoordFIT' 'ellipsoid' 'ellipsoidFIT' ...
  'ndensity' 'nvectorlength' 'nintensity' 'nprep' 'nprep2' 'nprep3' 'modelfit' 'params' 'R2' ...
- 'v' 'xx' 'yy' 'xxALT' 'yyALT' 'opt'};
+ 'v' 'xx' 'yy' 'xxALT' 'yyALT' 'fullarc' 'specialangles' 'opt'};
 clear results;
 for p=1:length(allvars)
   results.(allvars{p}) = eval(allvars{p});
