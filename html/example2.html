@@ -1,0 +1,136 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>example2</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-03-30"><meta name="DC.source" content="example2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Example 2: Apply TDM on an example dataset (quick version)</a></li><li><a href="#2">Download dataset (if necessary) and add TDM to the MATLAB path</a></li><li><a href="#3">Load in the data</a></li><li><a href="#4">Run extracthrfmanifold.m</a></li></ul></div><h2 id="1">Example 2: Apply TDM on an example dataset (quick version)</h2><pre class="codeinput"><span class="comment">% This is the same as Example 1 except that we skip straight to the</span>
+<span class="comment">% part where extracthrfmanifold.m is called. This is achieved by loading</span>
+<span class="comment">% exampledataset_inputsonly.mat, which contains the inputs to</span>
+<span class="comment">% extracthrfmanifold.m as computed from the Example 1 script.</span>
+</pre><h2 id="2">Download dataset (if necessary) and add TDM to the MATLAB path</h2><pre class="codeinput">setup;
+</pre><h2 id="3">Load in the data</h2><pre class="codeinput"><span class="comment">% Load in the data</span>
+load(<span class="string">'exampledataset_inputsonly.mat'</span>,<span class="string">'data'</span>,<span class="string">'intensity'</span>,<span class="string">'tr'</span>);
+</pre><h2 id="4">Run extracthrfmanifold.m</h2><pre class="codeinput"><span class="comment">% Use extracthrfmanifold.m to derive estimates of the latent early</span>
+<span class="comment">% and late timecourses. The 1 indicates to create figure windows.</span>
+results = extracthrfmanifold(data,intensity,tr,1);
+</pre><pre class="codeoutput">calculating particles...
+Wait while particle positions are being optimized ...
+Iteration #     Net Energy      Time (sec)     
+0               36941.141429    0.0            
+50              33918.245902    0.6            
+100             33917.634460    1.1            
+150             33917.160855    1.6            
+198             33916.974618    2.1            
+Optimization completed after 198 iterations. Elapsed time:   2.1 sec
+done.
+initial seed is [56 56 22.2 22.2 0.077348 0.070153 0]
+
+                                         Norm of      First-order 
+ Iteration  Func-count     f(x)          step          optimality
+     0          8         48.7855                           144
+     1         16          7.8951       0.575065           4.75      
+     2         24         7.22009             10             18      
+     3         32         3.63591        14.0484           10.3      
+     4         40         2.50037        12.7911          0.727      
+     5         48         2.47302        2.55428         0.0873      
+     6         56          2.4726       0.257195        0.00783      
+     7         64         2.47259      0.0113621        0.00141      
+     8         72         2.47259     0.00221868       0.000245      
+
+Local minimum possible.
+
+lsqcurvefit stopped because the final change in the sum of squares relative to 
+its initial value is less than the selected value of the function tolerance.
+
+
+
+</pre><img vspace="5" hspace="5" src="example2_01.png" alt=""> <img vspace="5" hspace="5" src="example2_02.png" alt=""> <img vspace="5" hspace="5" src="example2_03.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Example 2: Apply TDM on an example dataset (quick version)
+
+% This is the same as Example 1 except that we skip straight to the
+% part where extracthrfmanifold.m is called. This is achieved by loading
+% exampledataset_inputsonly.mat, which contains the inputs to 
+% extracthrfmanifold.m as computed from the Example 1 script.
+
+%% Download dataset (if necessary) and add TDM to the MATLAB path
+
+setup;
+
+%% Load in the data
+
+% Load in the data
+load('exampledataset_inputsonly.mat','data','intensity','tr');
+
+%% Run extracthrfmanifold.m
+
+% Use extracthrfmanifold.m to derive estimates of the latent early
+% and late timecourses. The 1 indicates to create figure windows.
+results = extracthrfmanifold(data,intensity,tr,1);
+%%
+
+##### SOURCE END #####
+--></body></html>
