@@ -40,6 +40,8 @@ opt = struct('numboots',0,'numpcstotry',0);  % to use denoising, could set numpc
 
 % Use GLMdenoisedata.m to fit a GLM that incorporates a single canonical HRF.
 % We use 6 condition-splits (so we get 6 distinct betas for each condition).
+% Note that randomization is used within condition_split.m so results may
+% be different each time it is run.
 resultsST = GLMdenoisedata(condition_split(design,6),data,stimdur,tr,'assume',[],opt, ...
                            'GLMdenoise_ST_figures');
 %%
