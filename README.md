@@ -18,8 +18,7 @@ The toolbox also relies on several external dependencies, a copy of which are
 included in the folder "external". These external dependencies include:
 - https://www.github.com/AntonSemechko/S2-Sampling-Toolbox
 - https://research.ics.aalto.fi/ica/fastica/
-- hist2d.m (web link is broken)
-
+- hist2d.m [the web link for this is broken]
 (The fastica toolbox is necessary only if you want to use the ICA-based procedure.)
 
 To use the toolbox, add it to your MATLAB path:
@@ -48,6 +47,8 @@ If you use TDM in your research, please cite the following pre-print:
   Kay K, Jamison KW, Zhang R, and Ugurbil K (2019)
     TDM: a temporal decomposition method for removing venous effects from task-based fMRI.
     bioRxiv. 
+
+Additional information can be found at the OSF site https://osf.io/j2wsc/.
 
 The code has been successfully run on MATLAB R2018a, but is likely compatible with
 any recent version of MATLAB.
