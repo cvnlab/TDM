@@ -53,6 +53,9 @@ temp(extrapmask) = NaN;          % some pixels are invalid; set these to NaN
 imagesc(temp,[0 50]);
 colormap(hot);
 axis image tight ij;
+xlabel('Posterior -> Anterior');
+ylabel('Inferior -> Superior');
+title('Variance explained by Standard GLM');
 %%
 
 % This is a nearest-neighbor rendering of a flat patch of left hemisphere early visual cortex.
@@ -84,15 +87,18 @@ resultsFIR = GLMdenoisedata(condition_split(design,2),data,stimdur,tr,'fir',30,o
 ix = 51344;
 figure; hold on;
 cmap0 = jet(6);
+h = [];
 for p=1:2     % condition-split
   for q=1:6   % condition
     temp = squeeze(resultsFIR.modelmd(ix,:,:));  % (2 condition-splits * 6 conditions) x 31 time points
-    plot(0:30,temp((q-1)*2+p,:),'-','Color',cmap0(q,:));
+    h(q) = plot(0:30,temp((q-1)*2+p,:),'-','Color',cmap0(q,:));
   end
 end
 straightline(0,'h','k-');
 xlabel('Time after trial onset (s)');
 ylabel('BOLD (%)');
+legend(h,mat2cellstr(1:6));
+title('FIR timecourses for one vertex to six stimulus rings (1 = foveal, 6 = peripheral)');
 %%
 
 % In the figure, we plot two traces (reflecting the 2 condition-splits)
@@ -143,6 +149,8 @@ resultsTDM = extracthrfmanifold(temp,bcvalues,tr,{'TDM_figures' -1},opt3);
 
 % In the above figure, the black and gray dots indicate the
 % Early and Late timecourses, respectively.
+%
+% This is comparable to Figure 4A in the BioRxiv manuscript.
 %%
 
 %%
@@ -153,6 +161,8 @@ resultsTDM = extracthrfmanifold(temp,bcvalues,tr,{'TDM_figures' -1},opt3);
 
 % In the above figure, we see that 'Model Fit' is a reasonably
 % good match to the data shown in 'Final'.
+%
+% This is comparable to Figure 4C in the BioRxiv manuscript.
 %%
 
 %%
@@ -163,6 +173,8 @@ resultsTDM = extracthrfmanifold(temp,bcvalues,tr,{'TDM_figures' -1},opt3);
 
 % In the above figure, the Early (black) and Late (gray)
 % timecourses look reasonable.
+%
+% This is comparable to Figure 4B in the BioRxiv manuscript.
 
 %% Fit TDM GLM
 
@@ -188,6 +200,10 @@ end
 figure;
 imagesc(design0{1});
 colormap(gray);
+colorbar;
+xlabel('Condition number');
+ylabel('TR');
+title('TDM design matrix for run 1');
 %%
 
 % Finally, we proceed to fit the GLM.
@@ -211,11 +227,15 @@ betas0 = reshape(resultsTDMGLM.modelmd{2},[],3,6,6,2);
 % The dimensionality is vertices x 3 depths.
 bc0 = reshape(bc,[],3);
 
+% Define some constants
+ellabels = {'Early' 'Late'};
+depthnums = [2 4 6];
+
 % Look at Early and Late betas for each experimental condition.
 % In the following figure, the rows indicate Early/Late,
 % while the columns indicate different conditions.
 depthix = 1;  % look at the first depth index (which is Depth 2)
-figureprep([100 100 1200 600],1);
+figureprep([0 0 1200 600],1);
 for q=1:2     % early/late
   for p=1:6   % condition
     subplot(2,6,(q-1)*6+p);
@@ -224,7 +244,12 @@ for q=1:2     % early/late
     temp(extrapmask) = NaN;
     imagesc(temp,[-10 10]);
     colormap(cmapsign4);
-    axis image tight ij off;
+    axis image tight ij;
+    set(gca,'XTick',[],'YTick',[]);
+    if p==1
+      ylabel(ellabels{q});
+    end
+    title(sprintf('Stimulus %d',p));
   end
 end
 %%
@@ -232,7 +257,7 @@ end
 % Look at peak eccentricity tuning for each depth.
 % In the following figure, the rows indicate Depth 2, 4, and 6,
 % while the columns indicate Early/Late.
-figureprep([100 100 1200 1000],1);
+figureprep([0 0 1200 1000],1);
 for q=1:2    % early/late
   for d=1:3  % depth index
     subplot(3,2,(d-1)*2+q); hold on;
@@ -241,13 +266,20 @@ for q=1:2    % early/late
     temp(extrapmask) = NaN;
     imagesc(temp,[1 6]);
     colormap(jet);
-    axis image tight ij off;
+    axis image tight ij;
+    set(gca,'XTick',[],'YTick',[]);
+    if d==1
+      title(ellabels{q});
+    end
+    if q==1
+      ylabel(sprintf('Depth %d',depthnums(d)));
+    end
   end
 end
 %%
 
 % Look at bias-corrected EPI intensity
-figureprep([100 100 1200 1000],1);
+figureprep([0 0 1200 1000],1);
 for d=1:3  % depth index
   subplot(3,1,d); hold on;
   temp = bc0(:,d);
@@ -256,6 +288,7 @@ for d=1:3  % depth index
   imagesc(temp,[0 2]);
   colormap(gray);
   axis image tight ij off;
+  title(sprintf('Depth %d',depthnums(d)));
 end
 %%
 
@@ -278,8 +311,10 @@ opt5 = struct();
 
 % Inspect results
 figure;
-plot(0:30,icahrf');
+h = plot(0:30,icahrf');
 straightline(0,'h','k-');
 xlabel('Time (s)');
 ylabel('Signal');
+legend(h,ellabels);
+title('ICA-based procedure');
 %%
