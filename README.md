@@ -21,6 +21,8 @@ included in the folder "external". These external dependencies include:
 - hist2d.m [the web link for this is broken]
 (The fastica toolbox is necessary only if you want to use the ICA-based procedure.)
 
+The total install time should be just a few minutes.
+
 To use the toolbox, add it to your MATLAB path:
   addpath(genpath('TDM'));
 
