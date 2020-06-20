@@ -75,7 +75,7 @@ if wantmeanadj
 
   % do PCA on the zero-mean version
   fun = @(x) x'*x;
-  [u,s,v] = svd(fun(zeromean(data,2)),0);
+  [~,~,v] = svd(fun(zeromean(data,2)),0);
 
   % get the first PC and adjust it to be relative to the value at time 0
   hrf = v(:,1)' - v(1,1);         % 1 x time
@@ -83,7 +83,7 @@ if wantmeanadj
 else
 
   % do PCA
-  [u,s,v] = svd(data'*data,0);
+  [~,~,v] = svd(data'*data,0);
 
   % get the first PC
   hrf = v(:,1)';                  % 1 x time
