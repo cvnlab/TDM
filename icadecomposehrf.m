@@ -161,7 +161,7 @@ for ccc=1:numcondsplit
   [xx(:,:,ccc),A(:,:,ccc),W(:,:,ccc)] = fastica(thedata,'numOfIC',numtime,fasticaopts{:});
 
   % compute variance explained!
-  listsofar0 = zeros(1,numtime);    % index of which one chosen at each iteration
+  listsofar0 = [];                  % index of which one chosen at each iteration
   finalvarexp0 = zeros(1,numtime);  % list of variance explained at each iteration
   for q=1:numtime
     varx = NaN(1,numtime);
@@ -174,7 +174,7 @@ for ccc=1:numcondsplit
     end
     [mm,ii] = max(varx);
     finalvarexp0(q) = mm;
-    listsofar0(q) = ii;
+    listsofar0 = [listsofar0 p];
   end
   
   % record
