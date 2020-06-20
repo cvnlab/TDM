@@ -149,6 +149,7 @@ function results = extracthrfmanifold(data,intensity,tr,wantfigs,opt)
 %   timecourses with respect to the <fullarc>. The angles lie within the range 0-180.
 %
 % History:
+% - 2020/06/20 - minor optimizations
 % - 2020/03/30 - version 1.1. changes include:
 %     (1) tweak documentation
 %     (2) add opt.ignorenegative input option
@@ -218,6 +219,7 @@ time0 = linspacefixeddiff(0,tr,numtime);
 % calc
 dif0 = diff(opt.bins(1:2));
 opt.binsEDGES = linspacefixeddiff(opt.bins(1)-dif0/2,dif0,length(opt.bins)+1);
+numbins = length(opt.bins);
 
 %% %%%%% COMPUTE SPHERE PARTICLES
 
@@ -238,19 +240,18 @@ fprintf('done.\n');
 %% %%%%% PERFORM PCA
 
 % pca
-[u,s,v] = svd(squish(permute(data,[3 1 2]),2),0);
+[~,~,v] = svd(squish(permute(data,[3 1 2]),2),0);
 
 % flip sign of first PC if necessary
 sgn = 2*((mean(v(hrfix0,1)) > 0) - 0.5);
 v(:,1) = sgn*v(:,1);
-u(:,1) = sgn*u(:,1);
 
 % compute some HRF metrics
 [hrf,peak,loc,risetime,falltime] = derivehrf(v(:,1)',tr,opt.rng,[],0);  % NO MEAN ADJUSTMENT
 
 % prepare outputs while dealing with scale issues
 mx = max(hrf);
-pcahrf = [hrf/mx];
+pcahrf = hrf/mx;
 pcahrfmetrics = [peak/mx loc risetime falltime];
 
 %% %%%%% COMPUTE HRF BASIS
@@ -306,11 +307,11 @@ end
 % terms of percent signal change) and median intensity. we use exactly the
 % same orthographic bins as used for the density. note that we prepare the
 % matrix such that the columns and rows proceed from negative to positive values.
-nvectorlength = [];
-nintensity = [];
-for cc=1:length(opt.binsEDGES)-1
+nvectorlength = zeros(numbins,numbins);
+nintensity    = zeros(numbins,numbins);
+for cc=1:numbins
   ok = find(XXX0 > opt.binsEDGES(cc) & XXX0 <= opt.binsEDGES(cc+1));
-  for rr=1:length(opt.binsEDGES)-1
+  for rr=1:numbins
     ok2 = find(YYY0(ok) > opt.binsEDGES(rr) & YYY0(ok) <= opt.binsEDGES(rr+1));
     nvectorlength(rr,cc) = median(m0l(ok(ok2)));
     nintensity(rr,cc) =    median(d0(ok(ok2)));
@@ -339,7 +340,7 @@ end
 themode = hx(iii);
 
 % stochastically subsample the timecourses such that we remove the DC "noise" level
-tokeep = logical(ones(size(XXX0,1),1));
+tokeep = true(size(XXX0,1),1);
 for p=1:size(SP,1)
   originalnum = histonsph(p);  % original number of particles that lie in this bin
   desirednum = round(max(0,originalnum-themode));  % the desired number of particles for this bin
@@ -376,12 +377,13 @@ temp = rotmatrix*[XXX0 YYY0 ZZZ0 ones(size(XXX0))]';
 ok = temp(3,:) > 0;
 XXX0t = temp(1,ok);
 YYY0t = temp(2,ok);
-nprep2 = [];
-for cc=1:length(opt.binsEDGES)-1
-  ok = find(XXX0t > opt.binsEDGES(cc) & XXX0t <= opt.binsEDGES(cc+1));
-  for rr=1:length(opt.binsEDGES)-1
-    ok2 = find(YYY0t(ok) > opt.binsEDGES(rr) & YYY0t(ok) <= opt.binsEDGES(rr+1));
-    nprep2(rr,cc) = median(m0l(ok(ok2)));
+nprep2 = zeros(numbins,numbins);
+for cc=1:numbins
+  ok = XXX0t > opt.binsEDGES(cc) & XXX0t <= opt.binsEDGES(cc+1);
+  m0ltemp = m0l(ok);
+  for rr=1:numbins
+    ok2 = YYY0t(ok) > opt.binsEDGES(rr) & YYY0t(ok) <= opt.binsEDGES(rr+1);
+    nprep2(rr,cc) = median(m0ltemp(ok2));
   end
 end
 
@@ -430,7 +432,7 @@ gcoord(3,:) = gcoord(1,:) - vec;
 
 % we also want contours of the 1-sd and 2-sd ellipsoids
 allangs = [linspacecircular(0,2*pi,100) 2*pi];
-ellipsoid = [];  % 101 x 2 (XY) x 2 (ellipsoids)
+ellipsoid = zeros(length(allangs),2,2);  % 101 x 2 (XY) x 2 (ellipsoids)
 for p=1:length(allangs)
   ellipsoid(p,:,1) = gcoord(1,:) + [cos(allangs(p))*params(3)   sin(allangs(p))*params(4)  ] * rot0;
   ellipsoid(p,:,2) = gcoord(1,:) + [cos(allangs(p))*params(3)*2 sin(allangs(p))*params(4)*2] * rot0;
@@ -451,7 +453,7 @@ ellipsoid = bfun(ellipsoid);
 assert(all(sum(gcoord(2:3,:).^2,2) < 1),'principal axis extends beyond unit circle');
 
 % define function to undo the rotation-to-z+
-undofun = @(x) inv(rotmatrix) * [x sqrt(1-sum(x.^2,2)) ones(size(x,1),1)]';  % result is 4 x N
+undofun = @(x) rotmatrix \ [x sqrt(1-sum(x.^2,2)) ones(size(x,1),1)]';  % result is 4 x N
 
 % keep a copy
 gcoordFIT = gcoord;
@@ -620,7 +622,7 @@ if ~isequal(wantfigs,0)
 
   % compute mixture
   ang = linspace(0,90,21);
-  coordscontinuum = [];  % points x 3
+  coordscontinuum = zeros(length(ang),3);  % points x 3
   for mm=1:length(ang)
     mix0 = cos(ang(mm)/180*pi) * [gcoord(2,:) sqrt(1-sum(gcoord(2,:).^2))] + ...
            sin(ang(mm)/180*pi) * [gcoord(3,:) sqrt(1-sum(gcoord(3,:).^2))];  % 3 x 1, unit vector
