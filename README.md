@@ -18,7 +18,6 @@ The toolbox also relies on several external dependencies, a copy of which are
 included in the folder "external". These external dependencies include:
 - https://www.github.com/AntonSemechko/S2-Sampling-Toolbox
 - https://research.ics.aalto.fi/ica/fastica/
-- hist2d.m [the web link for this is broken]
 (The fastica toolbox is necessary only if you want to use the ICA-based procedure.)
 
 The total install time should be just a few minutes.
@@ -40,10 +39,7 @@ A video walk-through of the example1.m script is viewable here:
   https://www.youtube.com/watch?v=Sz13i-9EtmA
 The video is quite comprehensive in what it covers and discusses.
 
-Terms of use: This content is licensed under a Creative Commons Attribution 3.0 
-Unported License (http://creativecommons.org/licenses/by/3.0/us/). You are free 
-to share and adapt the content as you please, under the condition that you cite 
-the appropriate manuscript (see below).
+Terms of use: This content is licensed under a BSD 3-Clause License.
 
 If you use TDM in your research, please cite the following pre-print:
   Kay K, Jamison KW, Zhang R, and Ugurbil K (2019)
@@ -68,34 +64,6 @@ Contents:
 - extracthrfmanifold.m - The TDM technique
 - html - Outputs from MATLAB's publish
 - icadecomposehrf.m - Alternative ICA-based technique
+- LICENSE - license information
 - README.md - The file you are reading
 - setup.m - A simple script that downloads the example data files and adds TDM to the MATLAB path
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Copyright (c) 2019, Kendrick Kay
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-The names of its contributors may not be used to endorse or promote products 
-derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
