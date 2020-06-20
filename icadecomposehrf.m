@@ -174,7 +174,7 @@ for ccc=1:numcondsplit
     end
     [mm,ii] = max(varx);
     finalvarexp0(q) = mm;
-    listsofar0 = [listsofar0 p];
+    listsofar0 = [listsofar0 ii];
   end
   
   % record
