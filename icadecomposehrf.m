@@ -169,8 +169,8 @@ for ccc=1:numcondsplit
       if ismember(p,listsofar0)
         continue;
       end
-      h = olsmatrix(A(:,[listsofar0 p]))*thedata;  % 1 x C*V with the estimated weights
-      varx(p) = calccod(flatten(A(:,[listsofar0 p])*h),flatten(thedata),[],[],0);  % compute variance explained
+      h = olsmatrix(A(:,[listsofar0 p],ccc))*thedata;  % 1 x C*V with the estimated weights
+      varx(p) = calccod(flatten(A(:,[listsofar0 p],ccc)*h),flatten(thedata),[],[],0);  % compute variance explained
     end
     [mm,ii] = max(varx);
     finalvarexp0(q) = mm;
