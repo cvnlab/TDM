@@ -54,6 +54,9 @@ function [icahrf,icahrfmetrics,pcahrf,pcahrfmetrics,allics,chosenics] = icadecom
 % - Finally, order the components in the determined pair such that the earlier-peaking
 %   component is first and the later-peaking component is second.
 %
+% History:
+% - 2020/06/20 - minor optimizations
+%
 % Return:
 % <icahrf> is 2 x time with the ICA-derived timecourses.
 %   The first row is the early-peaking timecourse, and the second row is the
@@ -142,11 +145,11 @@ pcahrfmetrics = [peak/mx loc risetime falltime];
 %%%%% PERFORM ICA
 
 % initialize
-xx = single([]);  % time x C*V x test/retest. this is the data, now maximally independent. A*xx gives the original data.
-A = [];           % time x time x test/retest. each column is a timecourse.
-W = [];           % time x time x test/retest. each row is a vector on which the data are projected.
-listsofar = [];   % test/retest x time with the index of the IC chosen at each iteration.
-finalvarexp = []; % test/retest x time with variance explained thus far at each tieration
+xx = zeros(numtime,numcond*numvox,numcondsplit,'single'); % time x C*V x test/retest. this is the data, now maximally independent. A*xx gives the original data.
+A = zeros(numtime,numtime,numcondsplit); % time x time x test/retest. each column is a timecourse.
+W = zeros(numtime,numtime,numcondsplit); % time x time x test/retest. each row is a vector on which the data are projected.
+listsofar = zeros(numcondsplit,numtime);   % test/retest x time with the index of the IC chosen at each iteration.
+finalvarexp = zeros(numcondsplit,numtime); % test/retest x time with variance explained thus far at each tieration
 
 % process test and retest
 for ccc=1:numcondsplit
@@ -158,8 +161,8 @@ for ccc=1:numcondsplit
   [xx(:,:,ccc),A(:,:,ccc),W(:,:,ccc)] = fastica(thedata,'numOfIC',numtime,fasticaopts{:});
 
   % compute variance explained!
-  listsofar0 = [];    % index of which one chosen at each iteration
-  finalvarexp0 = [];  % list of variance explained at each iteration
+  listsofar0 = zeros(1,numtime);    % index of which one chosen at each iteration
+  finalvarexp0 = zeros(1,numtime);  % list of variance explained at each iteration
   for q=1:numtime
     varx = NaN(1,numtime);
     for p=1:numtime
@@ -201,10 +204,10 @@ end
 cmatrix = calcconfusionmatrix(IC2,IC1,6);
 
 % iteratively determine the best match that links IC2 to IC1 [the order in IC1 matters! (the first several have privilege)]
-matchesinsecond = [];
+matchesinsecond = zeros(1,size(cmatrix,1));
 for p=1:size(cmatrix,1)
   remainder = setdiff(1:size(cmatrix,2),matchesinsecond);
-  [mx,ix] = max(cmatrix(p,remainder));
+  [~,ix] = max(cmatrix(p,remainder));
   matchesinsecond(p) = remainder(ix);
 end
 
@@ -244,7 +247,7 @@ for rr=goodix
     varvar(rr,cc) = calccod(flatten(thefit),flatten(thedata),[],[],0);
   end
 end
-[mx,ix] = max(varvar(:));
+[~,ix] = max(varvar(:));
 [mxROW,mxCOL] = ind2sub([numics numics],ix);
 hrfix1 = mxROW;  % for now, let's guess that the early HRF is the row one
 hrfix2 = mxCOL;
@@ -362,8 +365,8 @@ if ~isequal(wantfigs,0)
   subplot(4,1,3); hold on;
   cmap0 = jet(length(goodix));
   for p=1:length(goodix)
-    h1 = plot(time0,IC1(:,goodix(p)),'r-','Color',cmap0(p,:),'LineWidth',2);
-    h2 = plot(time0,IC2(:,goodix(p)),'r-','Color',cmap0(p,:),'LineWidth',2);
+    plot(time0,IC1(:,goodix(p)),'r-','Color',cmap0(p,:),'LineWidth',2);
+    plot(time0,IC2(:,goodix(p)),'r-','Color',cmap0(p,:),'LineWidth',2);
   end
   axis([0 time0(end) -.7 .7]);
   straightline(0,'h','k-');
