@@ -42,9 +42,9 @@ The video is quite comprehensive in what it covers and discusses.
 Terms of use: This content is licensed under a BSD 3-Clause License.
 
 If you use TDM in your research, please cite the following pre-print:
-  Kay K, Jamison KW, Zhang R, and Ugurbil K (2019)
-    TDM: a temporal decomposition method for removing venous effects from task-based fMRI.
-    bioRxiv. 
+  Kay, K., Jamison, K.W., Zhang, R.-Y., Ugurbil, K. 
+    A temporal decomposition method for identifying venous effects in task-based fMRI.
+    Nature Methods (2020).
 
 Additional information can be found at the OSF site https://osf.io/j2wsc/.
 

@@ -150,7 +150,7 @@ resultsTDM = extracthrfmanifold(temp,bcvalues,tr,{'TDM_figures' -1},opt3);
 % In the above figure, the black and gray dots indicate the
 % Early and Late timecourses, respectively.
 %
-% This is comparable to Figure 4A in the BioRxiv manuscript.
+% This is comparable to Figure 2A in the paper.
 %%
 
 %%
@@ -162,7 +162,7 @@ resultsTDM = extracthrfmanifold(temp,bcvalues,tr,{'TDM_figures' -1},opt3);
 % In the above figure, we see that 'Model Fit' is a reasonably
 % good match to the data shown in 'Final'.
 %
-% This is comparable to Figure 4C in the BioRxiv manuscript.
+% This is comparable to Figure 2C in the paper.
 %%
 
 %%
@@ -174,7 +174,7 @@ resultsTDM = extracthrfmanifold(temp,bcvalues,tr,{'TDM_figures' -1},opt3);
 % In the above figure, the Early (black) and Late (gray)
 % timecourses look reasonable.
 %
-% This is comparable to Figure 4B in the BioRxiv manuscript.
+% This is comparable to Figure 2B in the paper.
 
 %% Fit TDM GLM
 
